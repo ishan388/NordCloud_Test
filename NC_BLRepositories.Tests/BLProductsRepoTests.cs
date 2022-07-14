@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace NC_BLRepositories.Tests
 {
+    [TestFixture]
     public class BLProductsRepoTests
     {
         private BLProductsRepo blRepo;
@@ -39,6 +40,18 @@ namespace NC_BLRepositories.Tests
 
             mockDLRepo.Verify(svc => svc.AddProduct(product));
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void GetProduct_Test()
+        {
+            product.Id = 101;
+            mockDLRepo.Setup(svc => svc.GetProduct(product.Id)).ReturnsAsync(product);
+            ProductVM? result = blRepo.GetProduct(product.Id).Result.Data;
+
+            Assert.AreEqual(product.Name, result.Name);
+            Assert.AreEqual(product.Price, result.Price);
+            mockDLRepo.Verify(svc => svc.GetProduct(product.Id));
         }
 
         [Test]
@@ -69,18 +82,6 @@ namespace NC_BLRepositories.Tests
             Func<ProductVM, object> selector = o => new { o.Id, o.Name };
             Assert.That(result.Select(selector), Is.EquivalentTo(expected.Select(selector)));
             mockDLRepo.Verify(svc => svc.GetAllProducts());
-        }
-
-        [Test]
-        public void GetProduct_Test()
-        {
-            product.Id = 101;
-            mockDLRepo.Setup(svc => svc.GetProduct(product.Id)).ReturnsAsync(product);
-            ProductVM? result = blRepo.GetProduct(product.Id).Result.Data;
-
-            Assert.AreEqual(product.Name, result.Name);
-            Assert.AreEqual(product.Price, result.Price);
-            mockDLRepo.Verify(svc => svc.GetProduct(product.Id));
         }
 
         [Test]
